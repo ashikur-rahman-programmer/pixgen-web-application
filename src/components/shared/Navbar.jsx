@@ -1,11 +1,16 @@
 "use client";
+import { authClient } from "@/lib/auth-client";
+import { Button, Spinner } from "@heroui/react";
 import Image from "next/image";
 import Link from "next/link";
 
 const Navbar = () => {
+  const { data: session, isPending } = authClient.useSession();
+  const user = session?.user;
+
   return (
     <div className="border-b px-2">
-      <nav className=" flex justify-between items-center  py-3 max-w-7xl mx-auto w-full">
+      <nav className=" flex justify-between items-center flex-wrap py-3 max-w-7xl mx-auto w-full">
         <div className="flex gap-2 items-center">
           <Image
             src={"/logo.png"}
@@ -33,16 +38,41 @@ const Navbar = () => {
           </li>
         </ul>
 
-        <div className="flex gap-4">
-          <ul className="flex items-center gap-2  text-sm">
-            <li>
-              <Link href={"/signup"}>SignUp</Link>
-            </li>
-            <li>
-              <Link href={"/signin"}>SignIn</Link>
-            </li>
-          </ul>
-        </div>
+        {isPending ? (
+          <Spinner color="success" />
+        ) : user ? (
+          <div className="flex gap-4 items-center">
+            <p className="font-semibold text-purple-600">
+              Welcome, {user.name}
+            </p>
+            <Button
+              variant="secondary"
+              onClick={async () => await authClient.signOut()}
+            >
+              Signout
+            </Button>
+
+            {/* <ul className="flex items-center gap-2  text-sm">
+              <li>
+                <Link href={"/signup"}>SignUp</Link>
+              </li>
+              <li>
+                <Link href={"/signin"}>SignIn</Link>
+              </li>
+            </ul> */}
+          </div>
+        ) : (
+          <div className="flex gap-4">
+            <ul className="flex items-center gap-2  text-sm">
+              <li>
+                <Link href={"/signup"}>SignUp</Link>
+              </li>
+              <li>
+                <Link href={"/signin"}>SignIn</Link>
+              </li>
+            </ul>
+          </div>
+        )}
       </nav>
     </div>
   );
